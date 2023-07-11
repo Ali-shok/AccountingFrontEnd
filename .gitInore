@@ -1,0 +1,37 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build output
+dist/
+build/
+out/
+*.out
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore OS and temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.log
+
+# Ignore dependencies installed via package managers
+/yarn.lock
+/package-lock.json
+/.npmrc
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.*.local
+.env.*.prod
+
+# Ignore compiled or minified files
+*.min.js
+*.min.css
