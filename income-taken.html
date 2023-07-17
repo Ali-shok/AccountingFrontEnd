@@ -23,7 +23,7 @@
             <div class="d-flex pt-5">
                 <a href="welcome.html" class=" second-btn text-decoration-none">Home</a>
             </div>
-            <h1 class="text-center mb-5 pt-5 head">Income To Take</h1>
+            <h1 class="text-center mb-5 pt-5 head">Income Taken</h1>
             <a href="income-to-take-input.html"
                 class="second-btn d-flex ms-auto text-decoration-none add justify-content-center">ADD</a>
             <div class="table">
@@ -35,10 +35,9 @@
                             <th>amount</th>
                             <th>date</th>
                             <th>note</th>
+                            <th>emp name</th>
                             <th>service</th>
                             <th>customer name</th>
-                            <th>emp name</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -74,15 +73,15 @@
                 var table = $('#incomeDataTable').DataTable({
                     data: data,
                     columns: [
-                        { data: 'id' },
+                        { data: 'payment_id' },
                         { data: 'title' },
                         { data: 'amount' },
-                        { data: 'date' },
+                        { data: 'payment_date' },
                         { data: 'note' },
-                        { data: 'service' },
-                        { data: 'customer name' },
-                        { data: 'emp name' }
-                    ]
+                        { data: 'emp_name' },
+                        { data: 'service_name' },
+                        { data: 'customer_name' },
+                    ],
                 });
             }
         });
