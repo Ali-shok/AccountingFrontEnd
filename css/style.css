@@ -78,7 +78,6 @@ a {
 /* End Bridge */
 /* Start Cost Paid */
 .cost-paid .head {
-  padding-top: 120px;
   color: var(--main-color);
   font-size: 70px;
 }
