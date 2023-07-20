@@ -13,7 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
-    <title>Income To Take Input</title>
+    <title>Income-to-take-input</title>
 </head>
 
 <body>
@@ -23,23 +23,108 @@
                 <a href="cost-paid.html" class="text-decoration-none second-btn">&leftarrow;</a>
             </div>
             <h1 class="mt-5 head text-center text-md-start">Income To Take Input</h1>
-            <form class="text-center text-md-start">
-                <label>First name</label>
-                <input type="text">
-                <label>Last name</label>
-                <input type="text">
-                <label>Last name</label>
-                <input type="text">
-                <input type="submit" value="add" class="main-btn mx-auto mx-md-0">
+            <form class="text-center text-md-start" id="incomeToTakeForm">
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Title" required name="title">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Amount" required
+                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')" name="amount">
+                </div>
+                <div class="mb-3">
+                    <textarea style="width: 300px;" class="form-control" placeholder="Note" name="note"></textarea>
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Employee Name" required name="employee_name">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Customer Name" required name="customer_name">
+                </div>
+                <div class="mb-3">
+                    <select style="width: 300px;" class="form-select form-control" aria-label="Kind" required
+                        id="kindSelect" name="service_kind">
+                        <option disabled selected>Select a service Kind</option>
+                    </select>
+                </div>
+                <div class="text-md-start">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
             </form>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
         integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
         crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: 'http://localhost:3000/service',
+                method: 'GET',
+                success: function (response) {
+                    var select = $('#kindSelect');
+                    $.each(response, function (index, option) {
+                        select.append($('<option></option>').val(option.id).text(option.name));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error:', error);
+                }
+            });
+
+            $('#incomeToTakeForm').submit(function (event) {
+                event.preventDefault();
+
+                var title = $('#incomeToTakeForm input[name="title"]').val();
+                var amount = parseFloat($('#incomeToTakeForm input[name="amount"]').val());
+                var note = $('#incomeToTakeForm textarea[name="note"]').val();
+                var employee_name = $('#incomeToTakeForm input[name="employee_name"]').val();
+                var customer_name = $('#incomeToTakeForm input[name="customer_name"]').val();
+                var service_name = $('#kindSelect option:selected').text();
+                // Validate inputs
+                if (!title || !amount || !note || !employee_name || !customer_name || !service_name ) {
+                    alert('Please fill in all the required fields.');
+                    return;
+                }
+
+                // Create data object for the AJAX request
+                var data = {
+                    title: title,
+                    amount: amount,
+                    note: note,
+                    employee_name: employee_name,
+                    customer_name:customer_name,
+                    service_name: service_name
+                };
+                console.log(customer_name);
+
+                // Perform AJAX POST request
+                $.ajax({
+                    url: 'http://localhost:3000/insertData_income_to_take',
+                    method: 'POST',
+                    data: data,
+                    success: function (response) {
+                        // Handle success response
+                        console.log('Success:', response);
+                        // Reset the form
+                        $('#incomeToTakeForm')[0].reset();
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
