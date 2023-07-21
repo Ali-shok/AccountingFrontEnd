@@ -173,10 +173,8 @@
                 $(this).closest('tr').addClass('selected');
                 var serviceId = $(this).data('serviceid');
                 var serviceData = table.row($(this).closest('tr')).data();
-              
                 $('#editServiceName').val(serviceData.name);
                 $('#editServicePrice').val(serviceData.price_description);
-
                 $('#editModal').modal('show');
             });
 
