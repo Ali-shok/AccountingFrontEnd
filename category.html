@@ -73,94 +73,131 @@
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
     <script>
+        $(document).ready(function () {
+            var table;
 
-        // Function to load data and initialize DataTable
-        function loadDataAndInitializeTable() {
-            // Check if the DataTable is already initialized
-            if ($.fn.dataTable.isDataTable('#categorytable')) {
-                // Destroy the existing DataTable
-                $('#categorytable').DataTable().destroy();
+            function loadDataAndInitializeTable() {
+                if (table && $.fn.DataTable.isDataTable('#categorytable')) {
+                    table.destroy();
+                }
+
+                $.ajax({
+                    url: 'http://localhost:3000/category',
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(data);
+                        populateTable(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                });
             }
 
-            // Load data using AJAX
-            $.ajax({
-                url: 'http://localhost:3000/category',
-                method: 'GET',
-                success: function (data) {
-                    console.log(data);
-                    populateTable(data);
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        function deleteCategory(categoryId) {
-            $.ajax({
-                url: 'http://localhost:3000/category/' + categoryId,
-                type: 'DELETE',
-                success: function (data) {
-                    console.log('Category deleted successfully:', categoryId);
-                    // You can also reload the table data after successful deletion
-                    loadDataAndInitializeTable();
-                    
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error deleting category:', error);
-                }
-            });
-        }
-
-        function populateTable(data) {
-             table = $('#categorytable').DataTable({
-                data: data,
-                columns: [
-                    { data: 'id' },
-                    { data: 'name' },
-                    { data: 'note' },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return '<i class="fas fa-edit edit-icon" data-categoryid="' + row.id + '"></i>&nbsp;&nbsp;' +
-                                '<i class="fas fa-trash delete-icon" data-categoryid="' + row.id + '"></i>';
-                        }
+            function deleteCategory(categoryId) {
+                $.ajax({
+                    url: 'http://localhost:3000/category/' + categoryId,
+                    type: 'DELETE',
+                    success: function (data) {
+                        console.log('Category deleted successfully:', categoryId);
+                        // You can also reload the table data after successful deletion
+                        loadDataAndInitializeTable();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error deleting category:', error);
                     }
-                ],
-                initComplete: function () {
-                    $('#categorytable').on('click', 'i.edit-icon', function () {
-                        var categoryId = $(this).data('categoryid');
-                        // Get the category data from the table
-                        var categoryData = table.row($(this).closest('tr')).data();
-                        console.log(categoryData)
-                        console.log(categoryId)
+                });
+            }
 
-                        // Fill the modal fields with the category data
-                        $('#editCategoryName').val(categoryData.name);
-                        $('#editCategoryNote').val(categoryData.note);
+            function populateTable(data) {
+                if ($.fn.DataTable.isDataTable('#categorytable')) {
+                    // Destroy the existing DataTable to remove event listeners
+                    table.destroy();
+                }
+                table = $('#categorytable').DataTable({
+                    data: data,
+                    columns: [
+                        { data: 'id' },
+                        { data: 'name' },
+                        { data: 'note' },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return '<i class="fas fa-edit edit-icon" data-categoryid="' + row.id + '"></i>&nbsp;&nbsp;' +
+                                    '<i class="fas fa-trash delete-icon" data-categoryid="' + row.id + '"></i>';
+                            }
+                        }
+                    ]
+                });
+            }
 
-                        // Show the modal
-                        $('#editModal').modal('show');
-                    });
+            // Event listener for the edit icon
+            $('#categorytable').on('click', 'i.edit-icon', function () {
+                $('#categorytable tbody tr').removeClass('selected');
+                $(this).closest('tr').addClass('selected');
+                var categoryId = $(this).data('categoryid');
+                var categoryData = table.row($(this).closest('tr')).data();
+              
+                $('#editCategoryName').val(categoryData.name);
+                $('#editCategoryNote').val(categoryData.note);
 
-                    $('#categorytable').on('click', 'i.delete-icon', function () {
-                        var categoryId = $(this).data('categoryid');
-                        if (confirm('Are you sure you want to delete this category?')) {
-                            deleteCategory(categoryId);
-                            console.log('Delete Category ID:', categoryId);
+                $('#editModal').modal('show');
+            });
+
+            // Event listener for the "Save Changes" button in the modal
+            $('#saveChangesBtn').on('click', function () {
+                // Check if any row is selected
+                if (table.row('.selected').any()) {
+                    // Get the updated data from the modal inputs
+                    var categoryId = table.row('.selected').data().id; // Get the category ID from the selected row
+                    var categoryName = $('#editCategoryName').val();
+                    var categoryNote = $('#editCategoryNote').val();
+
+                    // Create an object with the updated data
+                    var updatedCategory = {
+                        name: categoryName,
+                        note: categoryNote
+                    };
+
+                    // Send a PUT request to update the category
+                    $.ajax({
+                        url: 'http://localhost:3000/category/' + categoryId,
+                        type: 'PUT',
+                        data: updatedCategory,
+                        success: function (data) {
+                            console.log('Category updated successfully:', data);
+                            // Close the modal after successful update
+                            $('#editModal').modal('hide');
+
+                            // Reload the table data after successful update
+                            loadDataAndInitializeTable();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('Error updating category:', error);
                         }
                     });
+                } else {
+                    console.log('No row selected.'); // Handle the case when no row is selected
                 }
             });
-        }
-        $(document).ready(function () {
-            // Load data and initialize DataTable
+
+            // Event listener for the delete icon
+            $('#categorytable').on('click', 'i.delete-icon', function () {
+                var categoryId = $(this).data('categoryid');
+                if (confirm('Are you sure you want to delete this category?')) {
+                    deleteCategory(categoryId);
+                    console.log('Delete Category ID:', categoryId);
+                }
+            });
+
+            // Initial data load and table initialization
             loadDataAndInitializeTable();
-
         });
-
     </script>
+
+
 </body>
 
 </html>
