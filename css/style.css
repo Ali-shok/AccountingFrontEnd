@@ -139,3 +139,7 @@ a {
   font-size: 50px;
 }
 /* End Cost Paid Input */
+/* Add a class to style the selected row */
+.selected {
+  background-color: #e9ecef; /* You can change the background color as per your design */
+}
