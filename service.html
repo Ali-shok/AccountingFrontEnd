@@ -179,17 +179,14 @@
                 $('#editServiceDesc').val(serviceData.description);
                 $('#editServiceCategory').val(serviceData.category_name);
                 $('#editModal').modal('show');
-                console.log(categoryValue);
                 var categoryDropdown = $('#editServiceCategory');
                      categoryDropdown.find('option').each(function () {
                     if ($(this).text() === categoryValue) {
                         $(this).prop('selected', true);
                     }
             });
+         });
 
-            });
-
-            // Event listener for the "Save Changes" button in the modal
             $('#saveChangesBtn').on('click', function () {
                 if (table.row('.selected').any()) {
                     // Get the updated data from the modal inputs
@@ -199,7 +196,6 @@
                     var servDesc= $('#editServiceDesc').val();
                     var category_kind = $('#editServiceCategory option:selected').val();
 
-                    // Create an object with the updated data
                     var updatedService = {
                         name: serviceName,
                         price: servicePrice,
