@@ -62,7 +62,7 @@
                             <input type="number" class="form-control" id="editServicePrice" required>
                         </div>
                         <div class="form-group">
-                            <label for="editServicePrice">Description</label>
+                            <label for="editServiceDescription">Description</label>
                             <textarea class="form-control" id="editServiceDesc" rows="3"></textarea>
                         </div>
                         <div class="form-group">
@@ -159,7 +159,7 @@
                         {
                             data: null,
                             render: function (data, type, row) {
-                                return '<i class="fas fa-edit edit-icon" data-serviceid="' + row.id + '"></i>&nbsp;&nbsp;' +
+                                return '<i class="fas fa-edit edit-icon" data-serviceid="' + row.id + '"  data-categoryid="' + row.category_name + '" ></i>&nbsp;&nbsp;' +
                                     '<i class="fas fa-trash delete-icon" data-serviceid="' + row.id + '"></i>';
                             }
                         }
@@ -172,26 +172,41 @@
                 $('#servicetable tbody tr').removeClass('selected');
                 $(this).closest('tr').addClass('selected');
                 var serviceId = $(this).data('serviceid');
+                var categoryValue = $(this).data('categoryid')
                 var serviceData = table.row($(this).closest('tr')).data();
-                $('#editServiceName').val(serviceData.name);
-                $('#editServicePrice').val(serviceData.price_description);
+                $('#editServiceName').val(serviceData.service_name);
+                $('#editServicePrice').val(serviceData.price);
+                $('#editServiceDesc').val(serviceData.description);
+                $('#editServiceCategory').val(serviceData.category_name);
                 $('#editModal').modal('show');
+                console.log(categoryValue);
+                var categoryDropdown = $('#editServiceCategory');
+                     categoryDropdown.find('option').each(function () {
+                    if ($(this).text() === categoryValue) {
+                        $(this).prop('selected', true);
+                    }
+            });
+
             });
 
             // Event listener for the "Save Changes" button in the modal
             $('#saveChangesBtn').on('click', function () {
-                // Check if any row is selected
                 if (table.row('.selected').any()) {
                     // Get the updated data from the modal inputs
-                    var serviceId = table.row('.selected').data().id; // Get the service ID from the selected row
+                    var serviceId = table.row('.selected').data().id; 
                     var serviceName = $('#editServiceName').val();
                     var servicePrice = $('#editServicePrice').val();
+                    var servDesc= $('#editServiceDesc').val();
+                    var category_kind = $('#editServiceCategory option:selected').val();
 
                     // Create an object with the updated data
                     var updatedService = {
                         name: serviceName,
-                        price_description: servicePrice
+                        price: servicePrice,
+                        description:servDesc,
+                        category_id:category_kind
                     };
+                    console.log(updatedService)
 
                     // Send a PUT request to update the service
                     $.ajax({
@@ -200,7 +215,6 @@
                         data: updatedService,
                         success: function (data) {
                             console.log('Service updated successfully:', data);
-                            // Close the modal after successful update
                             $('#editModal').modal('hide');
 
                             // Reload the table data after successful update
